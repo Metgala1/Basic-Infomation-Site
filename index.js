@@ -1,34 +1,38 @@
-const http = require('node:http');
-const fs = require('node:fs');
-const path = require('node:path');
+const http = require('http');
+const fs = require('fs');
+const path = require('path');
 
-const server = http.createServer()
+const server = http.createServer((req, res) => {
+  let filePath = '';
+  let contentType = 'text/html';
 
-server.on('request', (request, res) => {
-    let filePath = '';
+  if (req.url === '/' || req.url === '/index') {
+    filePath = path.join(__dirname, 'index.html');
+  } else if (req.url === '/about') {
+    filePath = path.join(__dirname, 'about.html');
+  } else if (req.url === '/contact-me') {
+    filePath = path.join(__dirname, 'contact-me.html');
+  } else if (req.url === '/style.css') {
+    filePath = path.join(__dirname, 'style.css');
+    contentType = 'text/css';
+  } else {
+    filePath = path.join(__dirname, '404.html');
+    res.statusCode = 404;
+  }
 
-    if(request.url === '/' || request.url === '/index') {
-        filePath = './index.html'
-    }else if(request.url === '/about') {
-        filePath = './about.html'
-    }else if(request = '/contact-me'){
-        filePath = './contact-me.html'
-    }else{
-        filePath = './404.html'
-        res.statusCode = 404;
+  // Read and serve the file
+  fs.readFile(filePath, (err, data) => {
+    if (err) {
+      res.writeHead(500);
+      res.end('Server Error!');
+    } else {
+      res.writeHead(res.statusCode || 200, { 'Content-Type': contentType });
+      res.end(data);
     }
-
-    fs.readFile(filePath, (err, data) => {
-        if(err){
-            res.writeHead(500);
-            res.end('Server Error');
-        }else{
-            res.writeHead(res.statusCode || 200, {'content-type': 'text/html'});
-            res.end(data)
-        }
-    })
-})
+  });
+});
 
 server.listen(8080, () => {
-    console.log('Server running at http:///localhost:8080')
+  console.log('Server running at http://localhost:8080');
 });
+
