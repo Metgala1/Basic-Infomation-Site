@@ -3,6 +3,7 @@ const fs = require('fs');
 const path = require('path');
 
 const server = http.createServer()
+
 server.on('request', (request, response) => {
   let filePath = ''
   let contentType = 'text/html'
@@ -11,28 +12,26 @@ server.on('request', (request, response) => {
     filePath = path.join(__dirname, 'index.html')
   }else if(request.url === '/about'){
     filePath = path.join(__dirname, 'about.html')
-  }else if(request.url === '/contact-me'){
+  }else if(request.url === 'contact-me'){
     filePath = path.join(__dirname, 'contact-me.html')
   }else if(request.url === '/style.css'){
     filePath = path.join(__dirname, 'style.css')
     contentType = 'text/css'
-  }
-  else{
+  }else {
     filePath = path.join(__dirname, '404.html')
   }
 
-  fs.readFile(filePath, (err, data ) => {
+  fs.readFile(filePath, (err, data) => {
     if(err){
       response.writeHead(500);
-      response.end(data)
-      return;
+      response.end('server error');
+      return
     }
-    response.writeHead(200, {'content-type': contentType})
+    response.writeHead(200, {'content-type': contentType});
     response.end(data)
-
   })
 })
 
-server.listen(7070, () => {
-  console.log('Code now running on localhost:7070')
+server.listen(5050, () => {
+  console.log('Server now running on localhost:5050')
 })
