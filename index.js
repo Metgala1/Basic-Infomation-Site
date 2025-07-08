@@ -1,37 +1,29 @@
-const http = require('http');
-const fs = require('fs');
+const express = require('express');
+const { request } = require('http');
 const path = require('path');
 
-const server = http.createServer()
+const app = express()
+require('dotenv').config()
 
-server.on('request', (request, response) => {
-  let filePath = ''
-  let contentType = 'text/html'
+const PORT = process.env.PORT || 2020;
 
-  if(request.url === '/' || request.url === '/index'){
-    filePath = path.join(__dirname, 'index.html')
-  }else if(request.url === '/about'){
-    filePath = path.join(__dirname, 'about.html')
-  }else if(request.url === 'contact-me'){
-    filePath = path.join(__dirname, 'contact-me.html')
-  }else if(request.url === '/style.css'){
-    filePath = path.join(__dirname, 'style.css')
-    contentType = 'text/css'
-  }else {
-    filePath = path.join(__dirname, '404.html')
-  }
+app.get(['/', '/index'], (request, response) => {
+  response.sendFile(path.join(__dirname, 'index.html'));
 
-  fs.readFile(filePath, (err, data) => {
-    if(err){
-      response.writeHead(500);
-      response.end('server error');
-      return
-    }
-    response.writeHead(200, {'content-type': contentType});
-    response.end(data)
-  })
+})
+app.get('/about', (request, response) => {
+  response.sendFile(path.join(__dirname, 'about.html'))
 })
 
-server.listen(5050, () => {
-  console.log('Server now running on localhost:5050')
+app.get('/contact-me', (request, response) => {
+  response.sendFile(path.join(__dirname, 'contact-me.html'))
+})
+app.use(express.static(path.join(__dirname)));
+
+app.use((request,response) => {
+  response.status(404).sendFile(path.join(__dirname, '404.html'))
+})
+
+app.listen(PORT, () => {
+  console.log(`Server now running on localhost ${PORT}`)
 })
